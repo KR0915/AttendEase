@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\EventRegistrationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -18,6 +19,11 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::resource('events', EventController::class);
+    
+    // イベント参加申込ルート
+    Route::post('/events/{event}/register', [EventRegistrationController::class, 'store'])->name('events.register');
+    Route::delete('/events/{event}/unregister', [EventRegistrationController::class, 'destroy'])->name('events.unregister');
+    Route::get('/events/{event}/participants', [EventRegistrationController::class, 'participants'])->name('events.participants');
 });
 
 require __DIR__.'/auth.php';

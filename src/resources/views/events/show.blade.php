@@ -6,12 +6,16 @@
             </h2>
             <div class="flex space-x-2">
                 <a href="{{ route('events.index') }}" 
-                   class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                   style="background-color: #6b7280; color: white; font-weight: bold; padding: 8px 16px; border-radius: 4px; text-decoration: none; display: inline-block; margin-right: 8px;"
+                   onmouseover="this.style.backgroundColor='#4b5563'"
+                   onmouseout="this.style.backgroundColor='#6b7280'">
                     一覧に戻る
                 </a>
                 @if ($event->created_by === auth()->id())
                     <a href="{{ route('events.edit', $event) }}" 
-                       class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">
+                       style="background-color: #eab308; color: white; font-weight: bold; padding: 8px 16px; border-radius: 4px; text-decoration: none; display: inline-block; margin-right: 8px;"
+                       onmouseover="this.style.backgroundColor='#a16207'"
+                       onmouseout="this.style.backgroundColor='#eab308'">
                         編集
                     </a>
                     <form action="{{ route('events.destroy', $event) }}" 
@@ -21,10 +25,57 @@
                         @csrf
                         @method('DELETE')
                         <button type="submit" 
-                                class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                                style="background-color: #ef4444; color: white; font-weight: bold; padding: 8px 16px; border-radius: 4px; border: none; cursor: pointer; margin-right: 8px;"
+                                onmouseover="this.style.backgroundColor='#dc2626'"
+                                onmouseout="this.style.backgroundColor='#ef4444'">
                             削除
                         </button>
                     </form>
+                    <a href="{{ route('events.participants', $event) }}" 
+                       style="background-color: #8b5cf6; color: white; font-weight: bold; padding: 8px 16px; border-radius: 4px; text-decoration: none; display: inline-block;"
+                       onmouseover="this.style.backgroundColor='#7c3aed'"
+                       onmouseout="this.style.backgroundColor='#8b5cf6'">
+                        参加者一覧
+                    </a>
+                @endif
+                
+                <!-- 参加申込ボタン（作成者以外） -->
+                @if ($event->created_by !== auth()->id())
+                    @if ($event->isRegisteredBy(auth()->user()))
+                        <!-- キャンセルボタン -->
+                        <form action="{{ route('events.unregister', $event) }}" 
+                              method="POST" 
+                              onsubmit="return confirm('参加申込をキャンセルしますか？')" 
+                              class="inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" 
+                                    style="background-color: #f97316; color: white; font-weight: bold; padding: 8px 16px; border-radius: 4px; border: none; cursor: pointer;"
+                                    onmouseover="this.style.backgroundColor='#c2410c'"
+                                    onmouseout="this.style.backgroundColor='#f97316'">
+                                申込キャンセル
+                            </button>
+                        </form>
+                    @elseif ($event->canRegister())
+                        <!-- 申込ボタン -->
+                        <form action="{{ route('events.register', $event) }}" 
+                              method="POST" 
+                              onsubmit="return confirm('このイベントに参加申込しますか？')" 
+                              class="inline">
+                            @csrf
+                            <button type="submit" 
+                                    style="background-color: #10b981; color: white; font-weight: bold; padding: 8px 16px; border-radius: 4px; border: none; cursor: pointer;"
+                                    onmouseover="this.style.backgroundColor='#059669'"
+                                    onmouseout="this.style.backgroundColor='#10b981'">
+                                参加申込
+                            </button>
+                        </form>
+                    @else
+                        <!-- 申込不可 -->
+                        <span style="background-color: #9ca3af; color: white; font-weight: bold; padding: 8px 16px; border-radius: 4px; cursor: not-allowed;">
+                            申込終了
+                        </span>
+                    @endif
                 @endif
             </div>
         </div>
