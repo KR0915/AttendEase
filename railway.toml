@@ -1,6 +1,6 @@
 [build]
 builder = "nixpacks"
-buildCommand = "bash deploy.sh"
+buildCommand = "bash deploy-simple.sh"
 
 [deploy]
 healthcheckPath = "/"
