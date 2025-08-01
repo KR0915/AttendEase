@@ -5,6 +5,8 @@ builder = "nixpacks"
 healthcheckPath = "/"
 healthcheckTimeout = 100
 restartPolicyType = "on_failure"
+startCommand = "php artisan serve --host=0.0.0.0 --port=${PORT:-8000}"
 
 [env]
 PORT = "8000"
+APP_ENV = "production"
