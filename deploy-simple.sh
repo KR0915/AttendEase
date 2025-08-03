@@ -107,6 +107,35 @@ echo "📊 データベースマイグレーション実行..."
 cd src && php artisan migrate --force -v || echo "⚠️ マイグレーションに失敗しました"
 cd ..
 
+echo "🔧 Railway環境でのis_activeカラム手動追加..."
+cd src && php artisan tinker --execute="
+try {
+    // eventsテーブルにis_activeカラムが存在するかチェック
+    \$hasColumn = DB::select('SHOW COLUMNS FROM events LIKE \"is_active\"');
+    
+    if (empty(\$hasColumn)) {
+        echo 'is_activeカラムが存在しません。追加します...' . PHP_EOL;
+        
+        // is_activeカラムを追加
+        DB::statement('ALTER TABLE events ADD COLUMN is_active TINYINT(1) NOT NULL DEFAULT 1 AFTER max_participants');
+        
+        echo 'is_activeカラムを追加しました！' . PHP_EOL;
+    } else {
+        echo 'is_activeカラムは既に存在します。' . PHP_EOL;
+    }
+    
+    // 現在のテーブル構造を確認
+    \$columns = DB::select('DESCRIBE events');
+    echo 'eventsテーブルの構造:' . PHP_EOL;
+    foreach (\$columns as \$column) {
+        echo \"- {\$column->Field} ({\$column->Type})\" . PHP_EOL;
+    }
+} catch (Exception \$e) {
+    echo 'エラー: ' . \$e->getMessage() . PHP_EOL;
+}
+" || echo "⚠️ is_activeカラム追加に失敗"
+cd ..
+
 echo "🌱 サンプルデータ投入..."
 cd src && php artisan db:seed --class=EventSeeder --force || echo "⚠️ シーダー実行に失敗しました"
 cd ..
