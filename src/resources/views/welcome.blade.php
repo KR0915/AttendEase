@@ -4,12 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AttendEase - イベント管理システム</title>
-    @if(app()->environment('production'))
-        <link rel="stylesheet" href="{{ asset('build/assets/app-Clx1hzJ1.css') }}">
-        <script src="{{ asset('build/assets/app-DtCVKgHt.js') }}" defer></script>
-    @else
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @endif
+    
+    <!-- Scripts -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-gray-100">
     <div class="min-h-screen flex items-center justify-center">
