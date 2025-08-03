@@ -16,6 +16,11 @@ src/yarn-error.log
 src/.DS_Store
 src/Thumbs.db
 
+# Root level sensitive files
+.env
+.env.backup
+.env.production
+
 # Build files
 src/public/build/
 src/public/mix-manifest.json
