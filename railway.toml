@@ -33,11 +33,11 @@ DB_USERNAME = "root"
 DB_PASSWORD = "ixOxZEOACaqQzVjzlFbnaDDeyMqErqRg"
 
 # Session & Cache
-SESSION_DRIVER = "database"
+SESSION_DRIVER = "file"
 SESSION_LIFETIME = "120"
 SESSION_ENCRYPT = "false"
-CACHE_STORE = "database"
-QUEUE_CONNECTION = "database"
+CACHE_STORE = "file"
+QUEUE_CONNECTION = "sync"
 
 # Logging (Debug enabled for troubleshooting)
 LOG_CHANNEL = "stack"
