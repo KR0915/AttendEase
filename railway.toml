@@ -11,3 +11,5 @@ startCommand = "cd src && php artisan serve --host=0.0.0.0 --port=${PORT:-8000}"
 [env]
 PORT = "8000"
 APP_ENV = "production"
+APP_DEBUG = "true"
+APP_KEY = "base64:YWRlYmMxNGRlYzM5MzMyNjQyYjFlZWI5NzQ4MGI4Y2IK"

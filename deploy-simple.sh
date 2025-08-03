@@ -2,7 +2,15 @@
 
 echo "🚀 Railway デプロイ開始..."
 
-echo "📦 Composer インストール..."
+echo "� 環境設定ファイルのコピー..."
+if [ -f ".env.production" ]; then
+    cp .env.production .env
+    echo "✓ .env.production を .env にコピーしました"
+else
+    echo "⚠️ .env.production が見つかりません"
+fi
+
+echo "�📦 Composer インストール..."
 composer install --no-dev --optimize-autoloader --no-interaction
 
 echo "🔑 設定ファイル最適化..."
