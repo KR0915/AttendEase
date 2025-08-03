@@ -58,7 +58,7 @@
 
                                             <div class="mt-3 text-sm text-gray-500">
                                                 <span class="font-medium">👤 作成者:</span>
-                                                {{ $event->creator->name }}
+                                                {{ $event->creator ? $event->creator->name : '不明なユーザー' }}
                                                 @if ($event->max_participants)
                                                     <span class="ml-4 font-medium">👥 定員:</span>
                                                     {{ $event->max_participants }}名

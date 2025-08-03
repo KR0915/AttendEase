@@ -107,6 +107,10 @@ echo "📊 データベースマイグレーション実行..."
 cd src && php artisan migrate --force -v || echo "⚠️ マイグレーションに失敗しました"
 cd ..
 
+echo "🌱 サンプルデータ投入..."
+cd src && php artisan db:seed --class=EventSeeder --force || echo "⚠️ シーダー実行に失敗しました"
+cd ..
+
 echo "📊 マイグレーション完了後の状態:"
 cd src && php artisan migrate:status || echo "⚠️ マイグレーション後の状態確認に失敗"
 cd ..
