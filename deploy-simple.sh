@@ -77,8 +77,14 @@ echo "🎨 アセットビルド..."
 npm ci --silent
 npm run build
 
+echo "📊 データベース接続テスト..."
+php artisan db:show || echo "⚠️ データベース接続情報を確認してください"
+
 echo "📊 データベースマイグレーション..."
-php artisan migrate --force
+php artisan migrate:status || echo "⚠️ マイグレーション状態を確認できませんでした"
+php artisan migrate --force -v
+echo "📊 マイグレーション完了後の状態..."
+php artisan migrate:status || echo "⚠️ マイグレーション後の状態確認に失敗"
 
 echo "🔄 アプリケーション最適化..."
 php artisan optimize
