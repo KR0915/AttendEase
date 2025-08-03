@@ -55,7 +55,7 @@ return [
 
         'postmark' => [
             'transport' => 'postmark',
-            // 'message_stream_id' => env('POSTMARK_MESSAGE_STREAM_ID'),
+            'message_stream_id' => env('POSTMARK_MESSAGE_STREAM_ID', null),
             // 'client' => [
             //     'timeout' => 5,
             // ],
@@ -72,7 +72,7 @@ return [
 
         'log' => [
             'transport' => 'log',
-            'channel' => env('MAIL_LOG_CHANNEL'),
+            'channel' => env('MAIL_LOG_CHANNEL', null),
         ],
 
         'array' => [
