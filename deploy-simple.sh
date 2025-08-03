@@ -111,6 +111,18 @@ echo "📊 マイグレーション完了後の状態:"
 cd src && php artisan migrate:status || echo "⚠️ マイグレーション後の状態確認に失敗"
 cd ..
 
+echo "🔍 eventsテーブルの構造確認:"
+cd src && php artisan tinker --execute="
+try {
+    \$columns = collect(DB::select('DESCRIBE events'))->pluck('Field');
+    echo 'Events table columns: ' . \$columns->join(', ') . PHP_EOL;
+    echo 'is_active column exists: ' . (\$columns->contains('is_active') ? 'YES' : 'NO') . PHP_EOL;
+} catch (Exception \$e) {
+    echo 'Error checking table structure: ' . \$e->getMessage() . PHP_EOL;
+}
+" || echo "⚠️ テーブル構造確認に失敗"
+cd ..
+
 echo "🔄 アプリケーション最適化..."
 cd src && php artisan optimize
 cd ..

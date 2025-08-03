@@ -15,7 +15,6 @@ class EventController extends Controller
     public function index(): View
     {
         $events = Event::with('creator')
-            ->where('is_active', true)
             ->orderBy('start_time', 'asc')
             ->paginate(10);
 
