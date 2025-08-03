@@ -107,33 +107,108 @@ echo "📊 データベースマイグレーション実行..."
 cd src && php artisan migrate --force -v || echo "⚠️ マイグレーションに失敗しました"
 cd ..
 
-echo "🔧 Railway環境でのis_activeカラム手動追加..."
+echo "🔧 Railway環境でのeventsテーブル構造確認・修正..."
 cd src && php artisan tinker --execute="
 try {
-    // eventsテーブルにis_activeカラムが存在するかチェック
-    \$hasColumn = DB::select('SHOW COLUMNS FROM events LIKE \"is_active\"');
+    echo '=== データベース構造の確認・修正開始 ===' . PHP_EOL;
     
-    if (empty(\$hasColumn)) {
-        echo 'is_activeカラムが存在しません。追加します...' . PHP_EOL;
+    // 1. eventsテーブルが存在するかチェック
+    \$tables = DB::select('SHOW TABLES LIKE \"events\"');
+    if (empty(\$tables)) {
+        echo 'eventsテーブルが存在しません。作成します...' . PHP_EOL;
         
-        // is_activeカラムを追加
-        DB::statement('ALTER TABLE events ADD COLUMN is_active TINYINT(1) NOT NULL DEFAULT 1 AFTER max_participants');
+        // eventsテーブルを作成
+        DB::statement('
+            CREATE TABLE events (
+                id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                title VARCHAR(255) NOT NULL,
+                description TEXT NULL,
+                location VARCHAR(255) NULL,
+                start_time DATETIME NOT NULL,
+                end_time DATETIME NOT NULL,
+                created_by BIGINT UNSIGNED NOT NULL,
+                max_participants INT NULL,
+                is_active BOOLEAN NOT NULL DEFAULT TRUE,
+                created_at TIMESTAMP NULL,
+                updated_at TIMESTAMP NULL,
+                INDEX idx_created_by (created_by),
+                INDEX idx_start_time (start_time),
+                INDEX idx_is_active (is_active)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        ');
         
-        echo 'is_activeカラムを追加しました！' . PHP_EOL;
+        echo 'eventsテーブルを作成しました！' . PHP_EOL;
     } else {
-        echo 'is_activeカラムは既に存在します。' . PHP_EOL;
+        echo 'eventsテーブルは存在します。構造を確認します...' . PHP_EOL;
+        
+        // is_activeカラムが存在するかチェック
+        \$hasIsActive = DB::select('SHOW COLUMNS FROM events LIKE \"is_active\"');
+        
+        if (empty(\$hasIsActive)) {
+            echo 'is_activeカラムが存在しません。追加します...' . PHP_EOL;
+            
+            // BOOLEANタイプでis_activeカラムを追加
+            DB::statement('ALTER TABLE events ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT TRUE AFTER max_participants');
+            
+            echo 'is_activeカラムを追加しました！' . PHP_EOL;
+        } else {
+            echo 'is_activeカラムは既に存在します。' . PHP_EOL;
+        }
     }
     
-    // 現在のテーブル構造を確認
-    \$columns = DB::select('DESCRIBE events');
-    echo 'eventsテーブルの構造:' . PHP_EOL;
-    foreach (\$columns as \$column) {
-        echo \"- {\$column->Field} ({\$column->Type})\" . PHP_EOL;
+    // 2. usersテーブルが存在するかチェック（外部キー制約のため）
+    \$userTables = DB::select('SHOW TABLES LIKE \"users\"');
+    if (empty(\$userTables)) {
+        echo 'usersテーブルが存在しません。作成します...' . PHP_EOL;
+        
+        // usersテーブルを作成
+        DB::statement('
+            CREATE TABLE users (
+                id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                email VARCHAR(255) NOT NULL UNIQUE,
+                email_verified_at TIMESTAMP NULL,
+                password VARCHAR(255) NOT NULL,
+                remember_token VARCHAR(100) NULL,
+                created_at TIMESTAMP NULL,
+                updated_at TIMESTAMP NULL
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        ');
+        
+        echo 'usersテーブルを作成しました！' . PHP_EOL;
     }
+    
+    // 3. 現在のテーブル構造を確認
+    \$columns = DB::select('DESCRIBE events');
+    echo PHP_EOL . '=== eventsテーブルの最終構造 ===' . PHP_EOL;
+    foreach (\$columns as \$column) {
+        echo \"- {\$column->Field}: {\$column->Type} | Null: {\$column->Null} | Default: {\$column->Default}\" . PHP_EOL;
+    }
+    
+    // 4. テストユーザーを作成（存在しない場合）
+    \$userCount = DB::table('users')->count();
+    if (\$userCount == 0) {
+        echo PHP_EOL . 'テストユーザーを作成します...' . PHP_EOL;
+        
+        DB::table('users')->insert([
+            'name' => 'System Admin',
+            'email' => 'admin@attendease.app',
+            'email_verified_at' => now(),
+            'password' => bcrypt('password'),
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+        
+        echo 'テストユーザーを作成しました！' . PHP_EOL;
+    }
+    
+    echo PHP_EOL . '=== データベース構造の確認・修正完了 ===' . PHP_EOL;
+    
 } catch (Exception \$e) {
     echo 'エラー: ' . \$e->getMessage() . PHP_EOL;
+    echo 'スタックトレース: ' . \$e->getTraceAsString() . PHP_EOL;
 }
-" || echo "⚠️ is_activeカラム追加に失敗"
+" || echo "⚠️ データベース構造修正に失敗"
 cd ..
 
 echo "🌱 サンプルデータ投入..."
